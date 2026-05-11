@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Tiny Think - Hafalan Surat Harian</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap" rel="stylesheet">
+
+<style>
+body{
+  margin:0;
+  font-family:'Fredoka', sans-serif;
+  background:linear-gradient(180deg,#f7fbff,#eef5ff);
+}
+
+.container{
+  max-width:700px;
+  margin:auto;
+  padding:20px;
+}
+
+.title{
+  text-align:center;
+  font-weight:900;
+  font-size:26px;
+  color:#1c2c6b;
+  margin-bottom:20px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+}
+
+.title-icon{
+  width:45px;
+  height:45px;
+
+  animation:bounce 2s infinite;
+}
+
+@keyframes bounce{
+  0%,100%{
+    transform:translateY(0);
+  }
+
+  50%{
+    transform:translateY(-5px);
+  }
+}
+
+/* LIST */
+.surat-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:#fff;
+  padding:14px;
+  border-radius:18px;
+  margin-bottom:12px;
+  box-shadow:0 10px 20px rgba(0,0,0,.08);
+  cursor:pointer;
+}
+
+.surat-left{display:flex;gap:12px;align-items:center;}
+.icon{
+  width:55px;
+  height:55px;
+  border-radius:50%;
+  background:#eaf7ff;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.surat-icon{
+  width:35px;
+  height:35px;
+
+  transition:.3s;
+}
+
+.surat-item:hover .surat-icon{
+  transform:scale(1.15) rotate(-8deg);
+}
+.arab{font-weight:900}
+.latin{font-size:13px;color:#6a74a8}
+
+.play{
+  width:40px;height:40px;border-radius:50%;
+  background:linear-gradient(90deg,#46b4ff,#62e6b0);
+  display:flex;align-items:center;justify-content:center;color:#fff;
+}
+
+/* MODAL */
+.modal{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.5);
+  display:none;justify-content:center;align-items:center;
+}
+.modal.show{display:flex}
+
+.modal-card{
+  width:95%;
+  max-width:700px;
+  border-radius:20px;
+  padding:20px;
+  position:relative;
+  z-index:1;
+
+  background-color:rgba(255,255,255,0.95);
+
+  .modal-card::before{
+  content:"✨ ⭐ 🌙 ✨";
+  position:absolute;
+  top:10px;
+  left:15px;
+  font-size:20px;
+  opacity:.5;
+}
+}
+
+.close{position:absolute;right:10px;top:10px;cursor:pointer}
+
+.modal-title{text-align:center;font-weight:900}
+
+.ayat-no{
+  text-align:center;
+  margin-top:10px;
+  font-weight:800;
+  color:#46b4ff;
+}
+
+.modal-arab{
+  font-size:clamp(24px,4vw,34px);
+  text-align:right;
+  margin:20px 0;
+  direction:rtl;
+  line-height:2.2;
+
+  word-break:break-word;
+
+  background:#fff;
+  padding:20px;
+  border-radius:20px;
+
+  box-shadow:0 5px 15px rgba(0,0,0,.05);
+
+  animation:fadeAyat .6s ease;
+}
+
+@keyframes fadeAyat{
+  from{
+    opacity:0;
+    transform:translateY(10px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+.modal-latin{font-style:italic}
+.modal-arti{background:#eef5ff;padding:10px;border-radius:10px;margin-top:10px}
+
+/* BUTTON */
+.btn{
+  margin-top:10px;
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.next{background:#4dabf7;color:#fff}
+.eye{background:#fff;border:1px solid #ccc}
+
+.ayat-symbol{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:32px;
+  height:32px;
+  margin-left:8px;
+  border:2px solid black;
+  border-radius:50%;
+  font-size:14px;
+  font-weight:bold;
+  color:black;
+  position:relative;
+}
+
+.ayat-symbol::before,
+.ayat-symbol::after{
+  content:"";
+  position:absolute;
+  width:6px;
+  height:6px;
+  background:black;
+  border-radius:50%;
+}
+
+.ayat-symbol::before{
+  top:-3px;
+}
+
+.ayat-symbol::after{
+  bottom:-3px;
+}
+
+.btn-group{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:15px;
+}
+
+.prev{
+  background:#ffb84d;
+  color:white;
+}
+
+.play-btn{
+  background:#7c5cff;
+  color:white;
+
+  box-shadow:0 0 15px rgba(124,92,255,.6);
+
+  animation:pulse 1.5s infinite;
+}
+
+@keyframes pulse{
+  0%{
+    transform:scale(1);
+  }
+  50%{
+    transform:scale(1.08);
+  }
+  100%{
+    transform:scale(1);
+  }
+}
+
+.finish-popup{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.5);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:999;
+}
+
+.finish-popup.show{
+  display:flex;
+}
+
+.finish-card{
+  background:white;
+  width:90%;
+  max-width:350px;
+  border-radius:25px;
+  padding:30px 20px;
+  text-align:center;
+
+  animation:pop .4s ease;
+
+  box-shadow:0 10px 30px rgba(0,0,0,.2);
+}
+
+.finish-icon{
+  font-size:55px;
+  margin-bottom:10px;
+}
+
+.finish-card h2{
+  color:#4dabf7;
+  margin-bottom:10px;
+}
+
+.finish-card p{
+  color:#555;
+  font-size:18px;
+  line-height:1.5;
+}
+
+.finish-card button{
+  margin-top:20px;
+  border:none;
+  background:linear-gradient(90deg,#46b4ff,#62e6b0);
+  color:white;
+  padding:12px 20px;
+  border-radius:15px;
+  font-size:16px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+@keyframes pop{
+  from{
+    transform:scale(.7);
+    opacity:0;
+  }
+  to{
+    transform:scale(1);
+    opacity:1;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<div class="title">
+  <img src="assets/images/slider/logo quran.png" class="title-icon">
+  Hafalan Surat Harian
+</div>
+<div id="list"></div>
+</div>
+
+<div class="modal" id="modal">
+<div class="modal-card">
+
+<div class="close" onclick="closeModal()">✖</div>
+
+<div class="modal-title" id="title"></div>
+<div class="ayat-no" id="ayatNo"></div>
+
+<div class="modal-arab" id="arab"></div>
+<div class="modal-latin" id="latin"></div>
+<div class="modal-arti" id="arti"></div>
+
+<div class="btn-group">
+  <button class="btn eye" onclick="toggleArti()">👀 Arti</button>
+  <button class="btn prev" onclick="prevAyat()">⬅ Back</button>
+  <button class="btn next" onclick="nextAyat()">➡ Next</button>
+  <button class="btn play-btn" onclick="playAudio()">🔊 Play</button>
+</div>
+</div>
+</div>
+
+<script>
+const suratData = [
+
+{
+judul:"Al-Fatihah",
+arabTitle:"الفاتحة",
+ayat:[
+{no:1,arab:"بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",latin:"Bismillahirrahmanirrahim",arti:"Dengan nama Allah Yang Maha Pengasih, Maha Penyayang"},
+{no:2,arab:"الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ",latin:"Alhamdu lillahi rabbil 'alamin",arti:"Segala puji bagi Allah, Tuhan seluruh alam"},
+{no:3,arab:"الرَّحْمَٰنِ الرَّحِيمِ",latin:"Arrahmanir rahim",arti:"Yang Maha Pengasih, Maha Penyayang"},
+{no:4,arab:"مَالِكِ يَوْمِ الدِّينِ",latin:"Maliki yaumiddin",arti:"Pemilik hari pembalasan"},
+{no:5,arab:"إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ",latin:"Iyyaka na'budu wa iyyaka nasta'in",arti:"Hanya kepada-Mu kami menyembah"},
+{no:6,arab:"اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ",latin:"Ihdinas siratal mustaqim",arti:"Tunjukilah kami jalan yang lurus"},
+{no:7,arab:"صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ",latin:"Siratal ladzina an'amta 'alaihim, gairil-magḍūbi 'alaihim walāḍ-ḍāllīn",arti:"Jalan orang-orang yang Engkau beri nikmat, bukan jalan mereka yang dimurkai dan bukan pula jalan mereka yang sesat."}
+]
+},
+
+{
+judul:"Al-Quraisy",
+arabTitle:"قريش",
+ayat:[
+{no:1,arab:"لِإِيلَافِ قُرَيْشٍ",latin:"Li ilaafi quraisy",arti:"Karena kebiasaan orang-orang Quraisy"},
+{no:2,arab:"إِيلَافِهِمْ رِحْلَةَ الشِّتَاءِ وَالصَّيْفِ",latin:"Ilaafihim rihlatasy syita'i wash shaif",arti:"(yaitu) kebiasaan mereka bepergian pada musim dingin dan musim panas"},
+{no:3,arab:"فَلْيَعْبُدُوا رَبَّ هَٰذَا الْبَيْتِ",latin:"Falya'budu rabba hadzal bait",arti:"Maka hendaklah mereka menyembah Tuhan pemilik rumah ini (Ka'bah),"},
+{no:4,arab:"الَّذِي أَطْعَمَهُمْ مِنْ جُوعٍ وَآمَنَهُمْ مِنْ خَوْفٍ",latin:"Allażī aṭ'amahum min jū'in wa āmanahum min khauf'",arti:"Yang telah memberi makanan kepada mereka untuk menghilangkan lapar dan mengamankan mereka dari rasa takut."}
+]
+},
+
+{
+judul:"Al-Fil",
+arabTitle:"الفيل",
+ayat:[
+{no:1,arab:"أَلَمْ تَرَ كَيْفَ فَعَلَ رَبُّكَ بِأَصْحَابِ الْفِيلِ",latin:"Alam tara kaifa fa'ala rabbuka bi aṣḥābil-fīl",arti:"Tidakkah kamu melihat bagaimana Tuhanmu memperlakukan tentara bergajah"},
+{no:2,arab:"أَلَمْ يَجْعَلْ كَيْدَهُمْ فِي تَضْلِيلٍ",latin:"Alam yaj'al kaidahum fī taḍlīl",arti:"Bukankah Dia telah menjadikan tipu daya mereka sia-sia?"},
+{no:3,arab:"وَأَرْسَلَ عَلَيْهِمْ طَيْرًا أَبَابِيلَ",latin:"Wa arsala 'alaihim ṭairan abābīl",arti:"Dan Dia mengirimkan kepada mereka burung yang berbondong-bondong,"},
+{no:4,arab:"تَرْمِيهِمْ بِحِجَارَةٍ مِنْ سِجِّيلٍ",latin:"Tarmīhim biḥijāratim min sijjīl",arti:"Yang melempari mereka dengan batu dari tanah yang terbakar,"},
+{no:5,arab:"فَجَعَلَهُمْ كَعَصْفٍ مَأْكُولٍ",latin:"Faja'alahum ka'aṣfim ma'kūl",arti:"Sehingga mereka dijadikan-Nya seperti daun-daun yang dimakan ulat."}
+]
+},
+
+{
+judul:"Al-Humazah",
+arabTitle:"الهمزة",
+ayat:[
+{no:1,arab:"وَيْلٌ لِكُلِّ هُمَزَةٍ لُمَزَةٍ",latin:"Wailul likulli humazatil lumazah",arti:"Celakalah bagi setiap pengumpat dan pencela"},
+{no:2,arab:"الَّذِي جَمَعَ مَالًا وَعَدَّدَهُ",latin:"Allażī jama'a mālaw wa 'addadah",arti:"Yang mengumpulkan harta dan menghitung-hitungnya"},
+{no:3,arab:"يَحْسَبُ أَنَّ مَالَهُ أَخْلَدَهُ",latin:"Yaḥsabu anna mālahu akhladah",arti:"Dia mengira bahwa hartanya itu dapat mengekalkannya"},
+{no:4,arab:"كَلَّا ۖ لَيُنْبَذَنَّ فِي الْحُطَمَةِ",latin:"Kallā layunbażanna fil-ḥuṭamah",arti:"Sekali-kali tidak! Pasti dia akan dilemparkan ke dalam (neraka) Huthamah"},
+{no:5,arab:"وَمَا أَدْرَاكَ مَا الْحُطَمَةُ",latin:"Wa mā adrāka mal-ḥuṭamah",arti:"Tahukah kamu apakah Huthamah itu?"},
+{no:6,arab:"نَارُ اللَّهِ الْمُوقَدَةُ",latin:"Nārullāhil-mūqadah",arti:"(Yaitu) api (azab) Allah yang dinyalakan"},
+{no:7,arab:"الَّتِي تَطَّلِعُ عَلَى الْأَفْئِدَةِ",latin:"Allatī taṭṭali'u 'alal-af'idah",arti:"Yang membakar sampai ke hati"},
+{no:8,arab:"إِنَّهَا عَلَيْهِمْ مُؤْصَدَةٌ",latin:"Innahā 'alaihim mu'ṣadah",arti:"Sungguh, api itu ditutup rapat atas mereka"},
+{no:9,arab:"فِي عَمَدٍ مُمَدَّدَةٍ",latin:"Fī 'amadim mumaddadah",arti:"Sedang mereka diikat pada tiang-tiang yang panjang."}
+]
+},
+
+{
+judul:"At-Takatsur",
+arabTitle:"التكاثر",
+ayat:[
+{no:1,arab:"أَلْهَاكُمُ التَّكَاثُرُ",latin:"Alhakumut takatsur",arti:"Bermegah-megahan telah melalaikan kamu"},
+{no:2,arab:"حَتَّىٰ زُرْتُمُ الْمَقَابِرَ",latin:"Ḥattā zurtumul-maqābir",arti:"Sampai kamu masuk ke dalam kubur"},
+{no:3,arab:"كَلَّا سَوْفَ تَعْلَمُونَ",latin:"Kallā saufa ta'lamūn",arti:"Sekali-kali tidak! Kelak kamu akan mengetahui."},
+{no:4,arab:"ثُمَّ كَلَّا سَوْفَ تَعْلَمُونَ",latin:"Ṡumma kallā saufa ta'lamūn",arti:"Kemudian sekali-kali tidak! Kelak kamu akan mengetahui"},
+{no:5,arab:"كَلَّا لَوْ تَعْلَمُونَ عِلْمَ الْيَقِينِ",latin:"Kallā lau ta'lamūna 'ilmal-yaqīn",arti:"Sekali-kali tidak! Sekiranya kamu mengetahui dengan pasti"},
+{no:6,arab:"لَتَرَوُنَّ الْجَحِيمَ",latin:"Latarawunnal-jaḥīm",arti:"Niscaya kamu benar-benar akan melihat neraka Jahim"},
+{no:7,arab:"ثُمَّ لَتَرَوُنَّهَا عَيْنَ الْيَقِينِ",latin:"Ṡumma latarawunnahā 'ainal-yaqīn",arti:"Kemudian kamu benar-benar akan melihatnya dengan mata kepala sendiri"},
+{no:8,arab:"ثُمَّ لَتُسْأَلُنَّ يَوْمَئِذٍ عَنِ النَّعِيمِ",latin:"Ṡumma latus'alunna yauma'iżin 'anin-na'īm",arti:"Kemudian kamu benar-benar akan ditanya pada hari itu tentang kenikmatan."}
+]
+},
+
+{
+judul:"Al-Adiyat",
+arabTitle:"العاديات",
+ayat:[
+{no:1,arab:"وَالْعَادِيَاتِ ضَبْحًا",latin:"Wal-'ādiyāti ḍabḥā",arti:"Demi kuda perang yang berlari kencang terengah-engah"},
+{no:2,arab:"فَالْمُورِيَاتِ قَدْحًا",latin:"Fal-mūriyāti qadḥā",arti:"Dan yang memercikkan bunga api"},
+{no:3,arab:"فَالْمُغِيرَاتِ صُبْحًا",latin:"Fal-mugīrāti ṣubḥā",arti:"Dan yang menyerang dengan tiba-tiba di waktu pagi"},
+{no:4,arab:"فَأَثَرْنَ بِهِ نَقْعًا",latin:"Fa aṡarna bihī naq'ā",arti:"Sehingga menerbangkan debu"},
+{no:5,arab:"فَوَسَطْنَ بِهِ جَمْعًا",latin:"Fawasaṭna bihī jam'ā",arti:"Lalu menyerbu ke tengah-tengah kumpulan musuh"},
+{no:6,arab:"إِنَّ الْإِنْسَانَ لِرَبِّهِ لَكَنُودٌ",latin:"Innal-insāna lirabbihī lakanūd",arti:"Sungguh manusia itu sangat ingkar kepada Tuhannya"},
+{no:7,arab:"وَإِنَّهُ عَلَىٰ ذَٰلِكَ لَشَهِيدٌ",latin:"Wa innahū 'alā żālika lasyahīd",arti:"Dan sesungguhnya dia menyaksikan keingkarannya itu,"},
+{no:8,arab:"وَإِنَّهُ لِحُبِّ الْخَيْرِ لَشَدِيدٌ",latin:"Wa innahū liḥubbil-khairi lasyadīd",arti:"Dan sesungguhnya cintanya kepada harta benar-benar berlebihan"},
+{no:9,arab:"فَلَا يَعْلَمُ إِذَا بُعْثِرَ مَا فِي الْقُبُورِ",latin:"Afalā ya'lamu iżā bu'ṡira mā fil-qubūr",arti:"Maka tidakkah dia mengetahui apabila apa yang di dalam kubur dikeluarkan"},
+{no:10,arab:"وَحُصِّلَ مَا فِي الصُّدُورِ",latin:"Wa ḥuṣṣila mā fiṣ-ṣudūr",arti:"Dan apa yang tersimpan di dalam dada dilahirkan,"},
+{no:11,arab:"إِنَّ رَبَّهُمْ بِهِمْ يَوْمَئِذٍ لَخَبِيرٌ",latin:"Inna rabbahum bihim yauma'iżil lakhabīr",arti:"Sungguh Tuhan mereka pada hari itu Maha Mengetahui keadaan mereka."}
+]
+},
+
+{
+judul:"Al-Baqarah 255",
+arabTitle:"آية الكرسي",
+ayat:[
+{no:255,arab:"اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ ۚ لَهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ ۗ مَنْ ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلَّا بِإِذْنِهِ ۚ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ ۖ وَلَا يُحِيطُونَ بِشَيْءٍ مِنْ عِلْمِهِ إِلَّا بِمَا شَاءَ ۚ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ ۖ وَلَا يَئُودُهُ حِفْظُهُمَا ۚ وَهُوَ الْعَلِيُّ الْعَظِيمُ",latin:"Allāhu lā ilāha illā huwal-ḥayyul-qayyūm, lā ta'khużuhū sinatuw walā naum. Lahū mā fis-samāwāti wa mā fil-arḍ. Man żallażī yasyfa'u 'indahū illā bi'iżnih. Ya'lamu mā baina aidīhim wa mā khalfahum, wa lā yuḥīṭūna bisyai'im min 'ilmihī illā bimā syā'. Wasi'a kursiyyuhus-samāwāti wal-arḍ, wa lā ya'ūdūhū ḥifẓuhumā, wa huwal-'aliyyul-'aẓīm.",arti:"Allah, tidak ada Tuhan selain Dia, Yang Maha Hidup, Yang terus-menerus mengurus makhluk-Nya. Tidak mengantuk dan tidak tidur. Milik-Nya apa yang ada di langit dan di bumi. Tidak ada yang dapat memberi syafaat di sisi-Nya tanpa izin-Nya. Dia mengetahui apa yang di hadapan mereka dan apa yang di belakang mereka. Mereka tidak mengetahui sesuatu apa pun dari ilmu-Nya melainkan apa yang Dia kehendaki. Kursi-Nya meliputi langit dan bumi. Dan Dia tidak merasa berat memelihara keduanya. Dan Dia Maha Tinggi lagi Maha Agung."}
+]
+}
+
+];
+
+let currentSurat=null;
+let index=0;
+let artiVisible=true;
+
+function render(){
+const list=document.getElementById("list");
+list.innerHTML="";
+suratData.forEach((s,i)=>{
+const item=document.createElement("div");
+item.className="surat-item";
+item.innerHTML=`
+<div class="surat-left">
+<div class="icon">
+  <img src="assets/images/slider/logo quran.png" class="surat-icon">
+</div>
+<div>
+<div class="arab">${s.arabTitle}</div>
+<div class="latin">${s.judul}</div>
+</div>
+</div>
+<div class="play">▶</div>`;
+item.onclick=()=>openModal(i);
+list.appendChild(item);
+});
+}
+
+function openModal(i){
+currentSurat=suratData[i];
+index=0;
+update();
+document.getElementById("modal").classList.add("show");
+}
+
+function closeModal(){
+document.getElementById("modal").classList.remove("show");
+}
+
+function update(){
+const ayat=currentSurat.ayat[index];
+
+document.getElementById("title").innerHTML=
+currentSurat.arabTitle+"<br><small>"+currentSurat.judul+"</small>";
+
+document.getElementById("ayatNo").innerText="Ayat "+ayat.no;
+  document.getElementById("arab").innerHTML =
+  ayat.arab + " <span dir='ltr' class='ayat-symbol'>" + toArabicNumber(ayat.no) + "</span>";
+  document.getElementById("latin").innerText=ayat.latin;
+  document.getElementById("arti").innerText=ayat.arti;
+}
+
+function nextAyat(){
+
+if(index < currentSurat.ayat.length - 1){
+
+  index++;
+  update();
+
+}else{
+
+  document.getElementById("finishPopup")
+  .classList.add("show");
+
+  document.getElementById("finishText")
+  .innerText =
+  "Horeee kamu telah menyelesaikan surat " +
+  currentSurat.judul + " 🎉🌈";
+
+}
+}
+
+function prevAyat(){
+if(index > 0){
+index--;
+update();
+}else{
+alert("Ini ayat pertama 😊");
+}
+}
+
+function toggleArti(){
+artiVisible=!artiVisible;
+document.getElementById("arti").style.display=artiVisible?"block":"none";
+}
+
+function toArabicNumber(num){
+  const arabicNums = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+  return num.toString().split('').map(d => arabicNums[d]).join('');
+}
+
+function closeFinishPopup(){
+  document.getElementById("finishPopup")
+  .classList.remove("show");
+}
+render();
+render();
+</script>
+
+<div class="finish-popup" id="finishPopup">
+  <div class="finish-card">
+    
+    <div class="finish-icon">✅😊</div>
+
+    <h2>Horeee 🎉</h2>
+
+    <p id="finishText">
+      Kamu berhasil menyelesaikan surat
+    </p>
+
+    <button onclick="closeFinishPopup()">
+      Alhamdulillah 🤍
+    </button>
+
+  </div>
+</div>
+</body>
+</html>
